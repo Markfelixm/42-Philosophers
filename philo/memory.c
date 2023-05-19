@@ -6,13 +6,12 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 15:02:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/15 20:59:34 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/05/19 20:27:29 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <string.h>
-#include <sys/time.h>
 
 bool	init_table(int ac, char **av, t_table *table)
 {
@@ -24,7 +23,7 @@ bool	init_table(int ac, char **av, t_table *table)
 	table->num_of_meals = -1;
 	if (ac == 6)
 		table->num_of_meals = ft_atoi(av[5]);
-	if (!gettimeofday(&(table->init_timestamp), NULL))
+	if (gettimeofday(&(table->init_ts), NULL))
 		return (false);
 	if (!init_seats(table))
 		return (false);
@@ -33,32 +32,32 @@ bool	init_table(int ac, char **av, t_table *table)
 
 bool	init_seats(t_table *table)
 {
-	int	seat;
+	int	pos;
 
-	seat = 0;
-	while (seat < table->num_of_seats)
+	pos = 0;
+	while (pos < table->num_of_seats)
 	{
-		if (!pthread_mutex_init(&(table->seats[seat].fork), NULL))
+		if (pthread_mutex_init(&(table->seats[pos].fork), NULL))
 			return (false);
-		if (!pthread_create(&(table->seats[seat].philo), NULL, live, NULL))
+		table->seats[pos].pos = pos;
+		table->seats[pos].error = false;
+		table->seats[pos].table = table;
+		table->seats[pos].meal_ts = table->init_ts;
+		if (pthread_create(&(table->seats[pos].philo), NULL,
+				(void *(*)(void *)) lives, &(table->seats[pos])))
 			return (false);
-		seat++;
+		pos++;
 	}
 	return (true);
 }
 
-bool	destroy_seats(t_table *table)
+bool	destroy_all_humans(t_table *table)
 {
-	int	seat;
+	int	pos;
 
-	seat = 0;
-	while (seat < table->num_of_seats)
-	{
-		if (!pthread_mutex_destroy(&(table->seats[seat].fork)))
+	pos = -1;
+	while (++pos < table->num_of_seats)
+		if (pthread_mutex_destroy(&(table->seats[pos].fork)))
 			return (false);
-		if (!pthread_detach(&(table->seats[seat].philo)))
-			return (false);
-		seat++;
-	}
 	return (true);
 }

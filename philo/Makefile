@@ -1,9 +1,13 @@
 NAME := philo
 SRC := \
 	philo.c \
-	time.c
+	time.c \
+	activity.c \
+	print.c \
+	memory.c \
+	atoi.c
 
-CC_FLAG := -Wall -Wextra -Werror -g
+CC_FLAG := -Wall -Wextra -Werror -Ofast
 
 .PHONY: all clean fclean re
 
