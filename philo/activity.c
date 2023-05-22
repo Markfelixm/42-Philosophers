@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/19 20:44:10 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/05/19 22:07:45 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ bool	has_died(t_table *table, int seat)
 void	lives(t_seat *seat)
 {
 	if (seat->pos % 2)
-		usleep(seat->table->time_to_eat);
+		if (usleep(seat->table->time_to_eat))
+			seat->error = true;
 	while (42)
 	{
 		if (!eats(seat))

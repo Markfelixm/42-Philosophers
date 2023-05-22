@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/19 20:43:57 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/05/22 15:49:24 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ int	main(int ac, char **av)
 		return (write(2, "Table initialization failed.\n", 30));
 	if (!monitor_philosophers(&table))
 		return (write(2, "Error during routine.\n", 23));
-	destroy_all_humans(&table);
+	if (!destroy_all_humans(&table))
+		return (write(2, "Could not destroy all humans :(\n", 33));
 }
 
 bool	monitor_philosophers(t_table *table)
@@ -34,8 +35,8 @@ bool	monitor_philosophers(t_table *table)
 	philos_done_eating = 0;
 	while (42)
 	{
-		pos = 0;
-		while (pos < table->num_of_seats)
+		pos = -1;
+		while (++pos < table->num_of_seats)
 		{
 			if (table->seats[pos].error)
 				return (false);
@@ -48,8 +49,8 @@ bool	monitor_philosophers(t_table *table)
 			}
 			if (philos_done_eating == table->num_of_seats)
 				return (true);
-			pos++;
-			usleep(2000 / table->num_of_seats);
+			if (usleep(5000 / table->num_of_seats))
+				return (false);
 		}
 	}
 	return (false);
