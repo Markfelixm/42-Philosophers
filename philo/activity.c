@@ -6,21 +6,12 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/19 22:07:45 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/05/24 14:51:49 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
-
-bool	has_died(t_table *table, int seat)
-{
-	const long	time = time_since_timestamp(&(table->seats[seat].meal_ts));
-
-	if (time > table->time_to_die || time == -1)
-		return (true);
-	return (false);
-}
 
 void	lives(t_seat *seat)
 {
@@ -29,8 +20,14 @@ void	lives(t_seat *seat)
 			seat->error = true;
 	while (42)
 	{
+		if (is_lonely_philo(seat)
+			|| is_done_eating(seat)
+			|| has_anyone_died(seat))
+			return ;
 		if (!eats(seat))
 			seat->error = true;
+		if (is_done_eating(seat) || has_anyone_died(seat))
+			return ;
 		if (!print_activity(seat, SLEEPING))
 			seat->error = true;
 		if (usleep(seat->table->time_to_sleep * 1000))
@@ -42,8 +39,7 @@ void	lives(t_seat *seat)
 
 bool	eats(t_seat *seat)
 {
-	if (seat->meals_eaten < seat->table->num_of_meals
-		|| seat->table->num_of_meals == -1)
+	if (!is_done_eating(seat))
 	{
 		if (!lock_forks(seat))
 			return (false);
@@ -60,40 +56,32 @@ bool	eats(t_seat *seat)
 	return (true);
 }
 
-bool	lock_forks(t_seat *seat)
+bool	is_done_eating(t_seat *seat)
 {
-	if (pthread_mutex_lock(&(seat->fork)))
-		return (false);
-	if (!print_activity(seat, TAKING_FORK))
-		return (false);
-	if (seat->pos == seat->table->num_of_seats - 1)
-	{
-		if (pthread_mutex_lock(&(seat->table->seats[0].fork)))
-			return (false);
-	}
-	else
-	{
-		if (pthread_mutex_lock(&(seat->table->seats[seat->pos + 1].fork)))
-			return (false);
-	}
-	if (!print_activity(seat, TAKING_FORK))
-		return (false);
-	return (true);
+	return (seat->table->num_of_meals != -1
+		&& seat->meals_eaten >= seat->table->num_of_meals);
 }
 
-bool	unlock_forks(t_table *table, int pos)
+bool	has_died(t_table *table, int seat)
 {
-	if (pos == table->num_of_seats - 1)
-	{
-		if (pthread_mutex_unlock(&(table->seats[0].fork)))
-			return (false);
-	}
-	else
-	{
-		if (pthread_mutex_unlock(&(table->seats[pos + 1].fork)))
-			return (false);
-	}
-	if (pthread_mutex_unlock(&(table->seats[pos].fork)))
+	const long	time = time_since_timestamp(&(table->seats[seat].meal_ts));
+
+	if (time > table->time_to_die || time == -1)
+		return (true);
+	return (false);
+}
+
+bool	is_lonely_philo(t_seat *seat)
+{
+	if (seat->table->num_of_seats != 1)
 		return (false);
+	if (pthread_mutex_lock(&(seat->fork)))
+		return (seat->error = true, true);
+	if (!print_activity(seat, TAKING_FORK))
+		return (seat->error = true, true);
+	if (usleep(seat->table->time_to_die * 1000))
+		return (seat->error = true, true);
+	if (pthread_mutex_unlock(&(seat->fork)))
+		return (seat->error = true, true);
 	return (true);
 }

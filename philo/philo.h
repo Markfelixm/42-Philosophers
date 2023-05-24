@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/19 22:07:25 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:10:01 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,31 +50,43 @@ typedef struct s_table
 	int				time_to_sleep;
 	int				num_of_meals;
 
+	pthread_mutex_t	died_mutex;
+	bool			has_anyone_died;
+
 	struct timeval	init_ts;
 
 	t_seat			seats[200];
 }	t_table;
 
-// Philosopher
+// philo.c
 bool	monitor_philosophers(t_table *table);
+
+// activity.c
 bool	has_died(t_table *table, int seat);
 void	lives(t_seat *seat);
 bool	eats(t_seat *seat);
-bool	lock_forks(t_seat *seat);
-bool	unlock_forks(t_table *table, int pos);
+bool	is_done_eating(t_seat *seat);
+bool	is_lonely_philo(t_seat *seat);
 
-// Memory
-bool	init_table(int ac, char **av, t_table *table);
+// memory.c
+bool	init_table(t_table *table, int ac, char **av);
 bool	init_seats(t_table *table);
 bool	destroy_all_humans(t_table *table);
 
-// Time
+// time.c
 long	time_since_timestamp(struct timeval *ts);
 
-// Print
+// print.c
 bool	print_activity(t_seat *seat, t_activity activity);
 
-// Utility
+// mutex.c
+bool	lock_forks(t_seat *seat);
+bool	unlock_forks(t_table *table, int pos);
+void	set_died_state(t_seat *seat);
+bool	get_died_state(t_seat *seat);
+bool	has_anyone_died(t_seat *seat);
+
+// atoi.c
 int		ft_atoi(const char *str);
 
 #endif

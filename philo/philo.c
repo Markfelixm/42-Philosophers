@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/22 15:49:24 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/05/24 18:10:58 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	main(int ac, char **av)
 
 	if (ac < 5 || ac > 6)
 		return (write(2, "Invalid number of arguments.\n", 30));
-	if (!init_table(ac, av, &table))
+	if (!init_table(&table, ac, av))
 		return (write(2, "Table initialization failed.\n", 30));
 	if (!monitor_philosophers(&table))
 		return (write(2, "Error during routine.\n", 23));

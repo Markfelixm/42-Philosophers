@@ -5,6 +5,7 @@ SRC := \
 	activity.c \
 	print.c \
 	memory.c \
+	mutex.c \
 	atoi.c
 
 CC_FLAG := -Wall -Wextra -Werror -Ofast
