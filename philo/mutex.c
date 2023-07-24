@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 14:50:13 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/24 14:52:04 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/24 18:20:36 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,18 +50,6 @@ bool	unlock_forks(t_table *table, int pos)
 	return (true);
 }
 
-bool	get_died_state(t_seat *seat)
-{
-	bool	someone_died;
-
-	if (pthread_mutex_lock(&(seat->table->died_mutex)))
-		return (seat->error = true, true);
-	someone_died = seat->table->has_anyone_died;
-	if (pthread_mutex_unlock(&(seat->table->died_mutex)))
-		return (seat->error = true, true);
-	return (someone_died);
-}
-
 void	set_died_state(t_seat *seat)
 {
 	if (pthread_mutex_lock(&(seat->table->died_mutex)))
@@ -79,9 +67,9 @@ bool	has_anyone_died(t_seat *seat)
 	bool	death_occured;
 
 	if (pthread_mutex_lock(&(seat->table->died_mutex)))
-		return (false);
+		return (seat->error = true, true);
 	death_occured = seat->table->has_anyone_died;
 	if (pthread_mutex_unlock(&(seat->table->died_mutex)))
-		return (false);
+		return (seat->error = true, true);
 	return (death_occured);
 }

@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/24 18:10:58 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/24 16:00:59 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,18 @@ bool	monitor_philosophers(t_table *table)
 				return (false);
 			if (has_died(table, pos))
 				return (print_activity(&(table->seats[pos]), DIED));
+			if (pthread_mutex_lock(&(table->seats[pos].meals_mutex)))
+				return (false);
 			if (table->seats[pos].meals_eaten == table->num_of_meals)
 			{
 				table->seats[pos].meals_eaten++;
 				philos_done_eating++;
 			}
+			if (pthread_mutex_unlock(&(table->seats[pos].meals_mutex)))
+				return (false);
 			if (philos_done_eating == table->num_of_seats)
 				return (true);
-			if (usleep(5000 / table->num_of_seats))
+			if (usleep(5000 / table->num_of_seats)) // TODO: try to rm
 				return (false);
 		}
 	}

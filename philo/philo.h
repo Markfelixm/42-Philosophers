@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/24 18:10:01 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/24 15:33:53 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ typedef struct s_seat
 
 	pthread_mutex_t	fork;
 	struct timeval	meal_ts;
+	pthread_mutex_t	meals_mutex;
 	int				meals_eaten;
 
 	bool			error;
@@ -83,7 +84,6 @@ bool	print_activity(t_seat *seat, t_activity activity);
 bool	lock_forks(t_seat *seat);
 bool	unlock_forks(t_table *table, int pos);
 void	set_died_state(t_seat *seat);
-bool	get_died_state(t_seat *seat);
 bool	has_anyone_died(t_seat *seat);
 
 // atoi.c

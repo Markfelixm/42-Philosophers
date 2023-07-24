@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 15:57:13 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/24 14:50:39 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/24 15:21:22 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ bool	print_activity(t_seat *seat, t_activity activity)
 
 	if (ts == -1)
 		return (false);
-	if (get_died_state(seat))
+	if (has_anyone_died(seat))
 		return (true);
 	if (pthread_mutex_lock(&print_mutex))
 		return (false);

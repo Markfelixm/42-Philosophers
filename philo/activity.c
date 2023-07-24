@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/24 14:51:49 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/24 18:21:52 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,11 @@ bool	eats(t_seat *seat)
 			return (false);
 		if (gettimeofday(&(seat->meal_ts), NULL))
 			return (false);
+		if (pthread_mutex_lock(&(seat->meals_mutex)))
+			return (false);
 		seat->meals_eaten++;
+		if (pthread_mutex_unlock(&(seat->meals_mutex)))
+			return (false);
 		if (usleep(seat->table->time_to_eat * 1000))
 			return (false);
 		if (!unlock_forks(seat->table, seat->pos))
@@ -58,8 +62,15 @@ bool	eats(t_seat *seat)
 
 bool	is_done_eating(t_seat *seat)
 {
-	return (seat->table->num_of_meals != -1
-		&& seat->meals_eaten >= seat->table->num_of_meals);
+	bool	is_done;
+
+	if (pthread_mutex_lock(&(seat->meals_mutex)))
+		return (seat->error = true, true);
+	is_done = (seat->table->num_of_meals != -1
+			&& seat->meals_eaten >= seat->table->num_of_meals);
+	if (pthread_mutex_unlock(&(seat->meals_mutex)))
+		return (seat->error = true, true);
+	return (is_done);
 }
 
 bool	has_died(t_table *table, int seat)

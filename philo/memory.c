@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 15:02:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/05/24 18:09:48 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/24 17:12:52 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ bool	init_seats(t_table *table)
 	{
 		if (pthread_mutex_init(&(table->seats[pos].fork), NULL))
 			return (false);
+		if (pthread_mutex_init(&(table->seats[pos].meals_mutex), NULL))
+			return (false);
 		table->seats[pos].pos = pos;
 		table->seats[pos].error = false;
 		table->seats[pos].table = table;
@@ -75,8 +77,10 @@ bool	destroy_all_humans(t_table *table)
 
 	pos = -1;
 	while (++pos < table->num_of_seats)
+	{
 		if (pthread_join(table->seats[pos].philo, NULL))
 			return (false);
+	}
 	pos = -1;
 	while (++pos < table->num_of_seats)
 		if (pthread_mutex_destroy(&(table->seats[pos].fork)))
