@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/24 16:00:59 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/25 18:40:07 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,18 @@ int	main(int ac, char **av)
 
 bool	monitor_philosophers(t_table *table)
 {
-	int		philos_done_eating;
-	int		pos;
+	static int	philos_done_eating = 0;
+	int			pos;
 
-	philos_done_eating = 0;
 	while (42)
 	{
 		pos = -1;
 		while (++pos < table->num_of_seats)
 		{
-			if (table->seats[pos].error)
-				return (false);
 			if (has_died(table, pos))
 				return (print_activity(&(table->seats[pos]), DIED));
-			if (pthread_mutex_lock(&(table->seats[pos].meals_mutex)))
+			if (table->seats[pos].error
+				|| pthread_mutex_lock(&(table->seats[pos].meals_mutex)))
 				return (false);
 			if (table->seats[pos].meals_eaten == table->num_of_meals)
 			{
@@ -53,8 +51,6 @@ bool	monitor_philosophers(t_table *table)
 				return (false);
 			if (philos_done_eating == table->num_of_seats)
 				return (true);
-			if (usleep(5000 / table->num_of_seats)) // TODO: try to rm
-				return (false);
 		}
 	}
 	return (false);

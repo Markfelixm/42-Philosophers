@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   activity.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/24 18:21:52 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/25 18:48:37 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ bool	eats(t_seat *seat)
 	{
 		if (!lock_forks(seat))
 			return (false);
-		if (!print_activity(seat, EATING))
-			return (false);
 		if (gettimeofday(&(seat->meal_ts), NULL))
+			return (false);
+		if (!print_activity(seat, EATING))
 			return (false);
 		if (pthread_mutex_lock(&(seat->meals_mutex)))
 			return (false);
@@ -77,8 +77,13 @@ bool	has_died(t_table *table, int seat)
 {
 	const long	time = time_since_timestamp(&(table->seats[seat].meal_ts));
 
-	if (time > table->time_to_die || time == -1)
+	if (time > table->time_to_die)
 		return (true);
+	if (time == -1)
+	{
+		table->seats[seat].error = true;
+		return (true);
+	}
 	return (false);
 }
 
