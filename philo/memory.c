@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 15:02:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/25 18:40:04 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/31 18:33:38 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ bool	valid_input(t_table *table, int ac, char **av)
 bool	init_table(t_table *table, int ac, char **av)
 {
 	memset(table, 0, sizeof(t_table));
-	if (pthread_mutex_init(&(table->died_mutex), NULL))
+	if (pthread_mutex_init(&(table->died_mutex), NULL)
+		|| pthread_mutex_init(&(table->gate), NULL)
+		|| pthread_mutex_init(&(table->print_mutex), NULL))
 		return (false);
 	table->has_anyone_died = false;
 	table->num_of_seats = ft_atoi(av[1]);
@@ -41,9 +43,9 @@ bool	init_table(t_table *table, int ac, char **av)
 		return (false);
 	if (ac == 6)
 		table->num_of_meals = ft_atoi(av[5]);
-	if (gettimeofday(&(table->init_ts), NULL))
-		return (false);
 	if (!init_seats(table))
+		return (false);
+	if (gettimeofday(&(table->init_ts), NULL))
 		return (false);
 	return (true);
 }
@@ -53,25 +55,30 @@ bool	init_seats(t_table *table)
 	int	pos;
 
 	pos = 0;
+
+	if (pthread_mutex_lock(&(table->gate)))
+		return (false);
 	while (pos < table->num_of_seats)
 	{
-		if (pthread_mutex_init(&(table->seats[pos].fork), NULL))
-			return (false);
-		if (pthread_mutex_init(&(table->seats[pos].meals_mutex), NULL))
+		if (pthread_mutex_init(&(table->seats[pos].fork), NULL)
+			|| pthread_mutex_init(&(table->seats[pos].meals_mutex), NULL))
 			return (false);
 		table->seats[pos].pos = pos;
 		table->seats[pos].error = false;
 		table->seats[pos].table = table;
-		table->seats[pos].meal_ts = table->init_ts;
+		if (gettimeofday(&(table->seats[pos].meal_ts), NULL))
+			return (false);
 		if (pthread_create(&(table->seats[pos].philo), NULL,
 				(void *(*)(void *)) lives, &(table->seats[pos])))
 			return (false);
 		pos++;
 	}
+	if (pthread_mutex_unlock(&(table->gate)))
+		return (false);
 	return (true);
 }
 
-bool	destroy_all_humans(t_table *table)
+bool	done_philosophizing(t_table *table)
 {
 	int	pos;
 

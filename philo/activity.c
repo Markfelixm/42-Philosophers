@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/25 18:48:37 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/31 18:40:01 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,11 @@
 
 void	lives(t_seat *seat)
 {
+	if (pthread_mutex_lock(&(seat->table->gate))
+		|| pthread_mutex_unlock(&(seat->table->gate)))
+		seat->error = true;
 	if (seat->pos % 2)
-		if (usleep(seat->table->time_to_eat))
+		if (usleep((seat->table->time_to_die * 1000) / 4))
 			seat->error = true;
 	while (42)
 	{

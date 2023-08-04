@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/25 18:40:07 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/31 18:42:19 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	main(int ac, char **av)
 		return (write(2, "Table initialization failed.\n", 30));
 	if (!monitor_philosophers(&table))
 		return (write(2, "Error during routine.\n", 23));
-	if (!destroy_all_humans(&table))
+	if (!done_philosophizing(&table))
 		return (write(2, "Could not destroy all humans :(\n", 33));
 }
 
@@ -38,7 +38,10 @@ bool	monitor_philosophers(t_table *table)
 		while (++pos < table->num_of_seats)
 		{
 			if (has_died(table, pos))
+			{
+				set_died_state(&(table->seats[pos]));
 				return (print_activity(&(table->seats[pos]), DIED));
+			}
 			if (table->seats[pos].error
 				|| pthread_mutex_lock(&(table->seats[pos].meals_mutex)))
 				return (false);

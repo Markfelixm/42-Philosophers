@@ -6,27 +6,30 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 14:50:13 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/25 18:40:06 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/31 18:31:32 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
+// #include <stdio.h> // TODO: rm
 bool	lock_forks(t_seat *seat)
 {
 	if (pthread_mutex_lock(&(seat->fork)))
 		return (false);
+	// printf("[DEBUG] %d locked own fork\n", seat->pos + 1);
 	if (!print_activity(seat, TAKING_FORK))
 		return (false);
 	if (seat->pos == seat->table->num_of_seats - 1)
 	{
 		if (pthread_mutex_lock(&(seat->table->seats[0].fork)))
 			return (false);
+		// printf("[DEBUG] %d locked fork 0\n", seat->pos + 1);
 	}
 	else
 	{
 		if (pthread_mutex_lock(&(seat->table->seats[seat->pos + 1].fork)))
 			return (false);
+		// printf("[DEBUG] %d locked fork %d\n", seat->pos + 1, seat->pos + 2);
 	}
 	if (!print_activity(seat, TAKING_FORK))
 		return (false);

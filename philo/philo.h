@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/25 18:40:03 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/07/31 18:23:15 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,15 @@ typedef struct s_table
 	int				time_to_sleep;
 	int				num_of_meals;
 
-	pthread_mutex_t	died_mutex;
-	bool			has_anyone_died;
-
 	struct timeval	init_ts;
 
 	t_seat			seats[200];
+
+	pthread_mutex_t	gate;
+	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	died_mutex;
+	bool			has_anyone_died;
+
 }	t_table;
 
 // philo.c
@@ -72,7 +75,7 @@ bool	is_lonely_philo(t_seat *seat);
 // memory.c
 bool	init_table(t_table *table, int ac, char **av);
 bool	init_seats(t_table *table);
-bool	destroy_all_humans(t_table *table);
+bool	done_philosophizing(t_table *table);
 
 // time.c
 long	time_since_timestamp(struct timeval *ts);
