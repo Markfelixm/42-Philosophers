@@ -1,11 +1,13 @@
 NAME := philo
 SRC := \
-	philo.c \
+	main.c \
 	time.c \
 	activity.c \
 	print.c \
-	memory.c \
-	mutex.c \
+	init.c \
+	destroy.c \
+	forks.c \
+	death.c \
 	atoi.c
 OBJ := $(SRC:.c=.o)
 CC_FLAG := -Wall -Wextra -Werror -Ofast

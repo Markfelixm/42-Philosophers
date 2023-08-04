@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/07/31 18:23:15 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/04 22:23:10 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,26 @@
 # define PHILO_H
 
 # include <pthread.h>
-# include <stdbool.h>
 # include <sys/time.h>
+# include <stdio.h>
+
+# ifndef USLEEP_INTERVAL
+#  define USLEEP_INTERVAL 200
+# endif
 
 typedef struct s_seat	t_seat;
 typedef struct s_table	t_table;
 
+typedef enum e_tri
+{
+	FALSE = 0,
+	TRUE = 1,
+	ERROR = 2
+}	t_tri;
+
 typedef enum e_actvity
 {
-	TAKING_FORK,
+	TAKEN_FORK,
 	EATING,
 	SLEEPING,
 	THINKING,
@@ -35,11 +46,13 @@ typedef struct s_seat
 	pthread_t		philo;
 
 	pthread_mutex_t	fork;
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
+
+	pthread_mutex_t	meal_ts_mutex;
 	struct timeval	meal_ts;
-	pthread_mutex_t	meals_mutex;
 	int				meals_eaten;
 
-	bool			error;
 	t_table			*table;
 }	t_seat;
 
@@ -55,39 +68,45 @@ typedef struct s_table
 
 	t_seat			seats[200];
 
-	pthread_mutex_t	gate;
-	pthread_mutex_t	print_mutex;
-	pthread_mutex_t	died_mutex;
-	bool			has_anyone_died;
+	pthread_mutex_t	death_mutex;
+	t_tri			death_occured;
 
+	pthread_mutex_t	gate;
+	pthread_mutex_t	print;
 }	t_table;
 
 // philo.c
-bool	monitor_philosophers(t_table *table);
+t_tri	monitor_philosophers(t_table *table);
 
 // activity.c
-bool	has_died(t_table *table, int seat);
-void	lives(t_seat *seat);
-bool	eats(t_seat *seat);
-bool	is_done_eating(t_seat *seat);
-bool	is_lonely_philo(t_seat *seat);
+t_tri	lives(t_seat *seat);
+t_tri	eats(t_seat *seat);
+t_tri	is_done_eating(t_seat *seat);
+t_tri	is_lonely_philo(t_seat *seat);
 
 // memory.c
-bool	init_table(t_table *table, int ac, char **av);
-bool	init_seats(t_table *table);
-bool	done_philosophizing(t_table *table);
+t_tri	init_table(t_table *table, int ac, char **av);
+t_tri	init_seats(t_table *table);
+t_tri	join_threads(t_table *table, int until);
+t_tri	destroy_seats(t_seat *seats, int until);
+t_tri	destroy_table(t_table *table);
 
 // time.c
 long	time_since_timestamp(struct timeval *ts);
+long	ft_usleep(long us);
 
 // print.c
-bool	print_activity(t_seat *seat, t_activity activity);
+t_tri	print_activity(t_seat *seat, t_activity activity);
 
-// mutex.c
-bool	lock_forks(t_seat *seat);
-bool	unlock_forks(t_table *table, int pos);
-void	set_died_state(t_seat *seat);
-bool	has_anyone_died(t_seat *seat);
+// forks.c
+void	assign_forks(t_seat *seat);
+t_tri	lock_forks(t_seat *seat);
+t_tri	unlock_forks(t_seat *seat);
+
+// death.c
+t_tri	set_died_state(t_table *table);
+t_tri	has_anyone_died(t_table *table);
+t_tri	has_died(t_seat *seat);
 
 // atoi.c
 int		ft_atoi(const char *str);
