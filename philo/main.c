@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 18:57:51 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 20:35:11 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ t_tri	monitor_philosophers(t_table *table)
 
 	while (42)
 	{
-		if (ft_usleep(table->num_of_seats * 5))
+		if (ft_usleep(table->num_of_seats * 10))
 			return (ERROR);
 		pos = -1;
 		while (++pos < table->num_of_seats)

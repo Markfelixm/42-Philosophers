@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 22:33:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 19:02:31 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 19:24:09 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,7 @@ t_tri	join_threads(t_table *table, int until)
 		if (pthread_join(table->seats[pos].philo, exit_code))
 			state = ERROR;
 		if (*((t_tri *) exit_code) == ERROR)
-		{
-			printf("[%d exit with error]\n", pos + 1);
 			state = TRUE;
-		}
 	}
 	free(exit_code);
 	return (state);
@@ -44,7 +41,8 @@ t_tri	destroy_seats(t_seat *seats, int until)
 	pos = -1;
 	while (++pos <= until)
 	{
-		if (pthread_mutex_destroy(&(seats[pos].fork)))
+		if (pthread_mutex_destroy(&(seats[pos].fork))
+			|| pthread_mutex_destroy(&(seats[pos].meal_ts_mutex)))
 			return (ERROR);
 	}
 	return (FALSE);

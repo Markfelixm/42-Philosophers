@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 19:10:24 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 19:37:38 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,11 @@ t_tri	init_routine(t_seat *seat)
 	if (pthread_mutex_lock(&(seat->table->gate))
 		|| pthread_mutex_unlock(&(seat->table->gate)))
 		return (ERROR);
+	if (pthread_mutex_lock(&(seat->meal_ts_mutex)))
+		return (ERROR);
 	seat->meal_ts = get_current_ms();
+	if (pthread_mutex_unlock(&(seat->meal_ts_mutex)))
+		return (ERROR);
 	state = is_lonely_philo(seat);
 	if (state)
 		return (state);
@@ -64,7 +68,11 @@ t_tri	eats(t_seat *seat)
 	if (state)
 		return (state);
 	seat->meals_eaten++;
+	if (pthread_mutex_lock(&(seat->meal_ts_mutex)))
+		return (ERROR);
 	seat->meal_ts = get_current_ms();
+	if (pthread_mutex_unlock(&(seat->meal_ts_mutex)))
+		return (ERROR);
 	state = print_activity(seat, EATING);
 	if (state)
 	{
@@ -110,8 +118,7 @@ t_tri	is_lonely_philo(t_seat *seat)
 		pthread_mutex_unlock(seat->left_fork);
 		return (ERROR);
 	}
-	state = print_activity(seat, DIED);
-	if (pthread_mutex_unlock(seat->left_fork) || state == ERROR)
+	if (pthread_mutex_unlock(seat->left_fork))
 		return (ERROR);
 	return (TRUE);
 }

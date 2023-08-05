@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 18:53:04 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 19:21:25 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct s_seat
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 
+	pthread_mutex_t	meal_ts_mutex;
 	t_ll			meal_ts;
 	int				meals_eaten;
 

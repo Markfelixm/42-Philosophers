@@ -6,12 +6,13 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 15:02:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 15:56:27 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 20:03:06 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <string.h>
+#include <limits.h>
 
 t_tri	valid_input(t_table *table, int ac, char **av)
 {
@@ -35,7 +36,8 @@ t_tri	init_seats(t_table *table)
 		return (ERROR);
 	while (++pos < table->num_of_seats)
 	{
-		if (pthread_mutex_init(&(table->seats[pos].fork), NULL))
+		if (pthread_mutex_init(&(table->seats[pos].fork), NULL)
+			|| pthread_mutex_init(&(table->seats[pos].meal_ts_mutex), NULL))
 			return (ERROR);
 		table->seats[pos].pos = pos;
 		table->seats[pos].table = table;

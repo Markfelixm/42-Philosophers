@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 16:59:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 18:41:33 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 20:09:58 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,11 @@ t_tri	has_died(t_seat *seat)
 	print_state = FALSE;
 	set_state = FALSE;
 	is_dead = FALSE;
+	if (pthread_mutex_lock(&(seat->meal_ts_mutex)))
+		return (ERROR);
 	time = time_since_timestamp(seat->meal_ts);
+	if (pthread_mutex_unlock(&(seat->meal_ts_mutex)))
+		return (ERROR);
 	if (time >= seat->table->time_to_die
 		&& has_anyone_died(seat->table) == FALSE)
 	{
