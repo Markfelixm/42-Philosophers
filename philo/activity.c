@@ -6,36 +6,24 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/04 22:48:47 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 19:10:24 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <unistd.h>
 
 t_tri	lives(t_seat *seat)
 {
 	t_tri	state;
 
-	if (pthread_mutex_lock(&(seat->table->gate))
-		|| pthread_mutex_unlock(&(seat->table->gate))
-		|| pthread_mutex_lock(&(seat->meal_ts_mutex))
-		|| gettimeofday(&(seat->meal_ts), NULL)
-		|| pthread_mutex_unlock(&(seat->meal_ts_mutex)))
-		return (ERROR);
-	state = is_lonely_philo(seat);
+	state = init_routine(seat);
 	if (state)
 		return (state);
-	if (seat->pos % 2)
-		if (ft_usleep(seat->table->time_to_die * 250))
-			return (ERROR);
 	while (42)
 	{
-		state = has_died(seat);
+		state = eats(seat);
 		if (state)
 			return (state);
-		if (eats(seat) == ERROR)
-			return (ERROR);
 		state = is_done_eating(seat);
 		if (state)
 			return (state);
@@ -51,6 +39,23 @@ t_tri	lives(t_seat *seat)
 	return (ERROR);
 }
 
+t_tri	init_routine(t_seat *seat)
+{
+	t_tri	state;
+
+	if (pthread_mutex_lock(&(seat->table->gate))
+		|| pthread_mutex_unlock(&(seat->table->gate)))
+		return (ERROR);
+	seat->meal_ts = get_current_ms();
+	state = is_lonely_philo(seat);
+	if (state)
+		return (state);
+	if (seat->pos % 2)
+		if (ft_usleep(seat->table->time_to_eat * 500))
+			return (ERROR);
+	return (FALSE);
+}
+
 t_tri	eats(t_seat *seat)
 {
 	t_tri	state;
@@ -59,18 +64,18 @@ t_tri	eats(t_seat *seat)
 	if (state)
 		return (state);
 	seat->meals_eaten++;
+	seat->meal_ts = get_current_ms();
 	state = print_activity(seat, EATING);
 	if (state)
+	{
+		if (unlock_forks(seat))
+			return (ERROR);
 		return (state);
-	if (pthread_mutex_lock(&(seat->meal_ts_mutex))
-		|| gettimeofday(&(seat->meal_ts), NULL)
-		|| pthread_mutex_unlock(&(seat->meal_ts_mutex)))
+	}
+	if (ft_usleep(seat->table->time_to_eat * 1000)
+		|| unlock_forks(seat))
 		return (ERROR);
-	if (ft_usleep(seat->table->time_to_eat * 1000))
-		return (ERROR);
-	if (unlock_forks(seat) == ERROR)
-		return (ERROR);
-	return (TRUE);
+	return (FALSE);
 }
 
 t_tri	is_done_eating(t_seat *seat)

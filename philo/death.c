@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 16:59:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/04 20:59:02 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 18:41:33 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,23 +36,23 @@ t_tri	has_anyone_died(t_table *table)
 
 t_tri	has_died(t_seat *seat)
 {
-	long	time;
-	t_tri	is_dead;
-	t_tri	print_state;
-	t_tri	set_state;
+	long long	time;
+	t_tri		is_dead;
+	t_tri		print_state;
+	t_tri		set_state;
 
+	print_state = FALSE;
+	set_state = FALSE;
 	is_dead = FALSE;
-	if (pthread_mutex_lock(&(seat->meal_ts_mutex)))
-		return (ERROR);
-	time = time_since_timestamp(&(seat->meal_ts));
-	if (has_anyone_died(seat->table) == FALSE && time > seat->table->time_to_die)
+	time = time_since_timestamp(seat->meal_ts);
+	if (time >= seat->table->time_to_die
+		&& has_anyone_died(seat->table) == FALSE)
 	{
 		is_dead = TRUE;
 		print_state = print_activity(seat, DIED);
 		set_state = set_died_state(seat->table);
 	}
-	if (pthread_mutex_unlock(&(seat->meal_ts_mutex))
-		|| time == -1 || print_state == ERROR || set_state == ERROR)
+	if (time == -1 || print_state == ERROR || set_state == ERROR)
 		return (ERROR);
 	return (is_dead);
 }

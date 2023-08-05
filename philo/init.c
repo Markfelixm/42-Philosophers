@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 15:02:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/04 22:37:37 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 15:56:27 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,7 @@ t_tri	init_seats(t_table *table)
 		return (ERROR);
 	while (++pos < table->num_of_seats)
 	{
-		if (pthread_mutex_init(&(table->seats[pos].fork), NULL)
-			|| pthread_mutex_init(&(table->seats[pos].meal_ts_mutex), NULL))
+		if (pthread_mutex_init(&(table->seats[pos].fork), NULL))
 			return (ERROR);
 		table->seats[pos].pos = pos;
 		table->seats[pos].table = table;
@@ -69,15 +68,15 @@ t_tri	init_table(t_table *table, int ac, char **av)
 	if (!valid_input(table, ac, av))
 	{
 		if (pthread_mutex_destroy(&(table->death_mutex))
-		|| pthread_mutex_destroy(&(table->gate))
-		|| pthread_mutex_destroy(&(table->print)))
+			|| pthread_mutex_destroy(&(table->gate))
+			|| pthread_mutex_destroy(&(table->print)))
 			return (ERROR);
 		return (TRUE);
 	}
 	if (ac == 6)
 		table->num_of_meals = ft_atoi(av[5]);
-	if (gettimeofday(&(table->init_ts), NULL)
-		|| init_seats(table) == ERROR)
+	table->init_ts = get_current_ms();
+	if (init_seats(table) == ERROR)
 		return (ERROR);
 	return (FALSE);
 }

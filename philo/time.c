@@ -6,44 +6,51 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 18:04:06 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/04 18:17:27 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 18:53:16 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <unistd.h>
 
-long	time_since_timestamp(struct timeval *ts)
+t_ll	get_ms(struct timeval *ts)
+{
+	t_ll	out;
+
+	out = ts->tv_usec / 1000LL;
+	out += ts->tv_sec * 1000LL;
+	return (out);
+}
+
+t_ll	get_current_ms(void)
 {
 	struct timeval	now;
-	long			diff;
 
 	if (gettimeofday(&now, NULL))
 		return (-1);
-	diff = now.tv_usec - ts->tv_usec;
-	diff += 1000000 * (now.tv_sec - ts->tv_sec);
-	diff /= 1000;
-	return (diff);
+	return (get_ms(&now));
 }
 
-long	ft_usleep(long us)
+t_ll	time_since_timestamp(t_ll ts)
 {
-	return (usleep(us));
-	// struct timeval	begin;
-	// long			diff;
+	t_ll	out;
 
-	// if (gettimeofday(&begin, NULL))
-	// 	return (-1);
-	// while (42)
-	// {
-	// 	diff = time_since_timestamp(&begin);
-	// 	if (diff >= us)
-	// 		return (0);
-	// 	else if (diff == -1)
-	// 		return (-1);
-	// 	else
-	// 		if (usleep(USLEEP_INTERVAL))
-	// 			return (-1);
-	// }
-	// return (0);
+	out = get_current_ms() - ts;
+	if (out < 0)
+		out = -1;
+	return (out);
+}
+
+int	ft_usleep(t_ll us)
+{
+	t_ll	start;
+
+	start = get_current_ms();
+	while (42)
+	{
+		if (time_since_timestamp(start) * 1000 >= us)
+			return (0);
+		if (usleep(USLEEP_INTERVAL))
+			return (-1);
+	}
+	return (-1);
 }

@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/04 22:23:10 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 18:53:04 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,16 @@
 # include <pthread.h>
 # include <sys/time.h>
 # include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
 # ifndef USLEEP_INTERVAL
-#  define USLEEP_INTERVAL 200
+#  define USLEEP_INTERVAL 500
 # endif
 
 typedef struct s_seat	t_seat;
 typedef struct s_table	t_table;
+typedef long long		t_ll;
 
 typedef enum e_tri
 {
@@ -49,8 +52,7 @@ typedef struct s_seat
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 
-	pthread_mutex_t	meal_ts_mutex;
-	struct timeval	meal_ts;
+	t_ll			meal_ts;
 	int				meals_eaten;
 
 	t_table			*table;
@@ -64,7 +66,7 @@ typedef struct s_table
 	int				time_to_sleep;
 	int				num_of_meals;
 
-	struct timeval	init_ts;
+	t_ll			init_ts;
 
 	t_seat			seats[200];
 
@@ -80,6 +82,7 @@ t_tri	monitor_philosophers(t_table *table);
 
 // activity.c
 t_tri	lives(t_seat *seat);
+t_tri	init_routine(t_seat *seat);
 t_tri	eats(t_seat *seat);
 t_tri	is_done_eating(t_seat *seat);
 t_tri	is_lonely_philo(t_seat *seat);
@@ -92,8 +95,10 @@ t_tri	destroy_seats(t_seat *seats, int until);
 t_tri	destroy_table(t_table *table);
 
 // time.c
-long	time_since_timestamp(struct timeval *ts);
-long	ft_usleep(long us);
+t_ll	time_since_timestamp(t_ll ts);
+int		ft_usleep(t_ll us);
+t_ll	get_ms(struct timeval *ts);
+t_ll	get_current_ms(void);
 
 // print.c
 t_tri	print_activity(t_seat *seat, t_activity activity);

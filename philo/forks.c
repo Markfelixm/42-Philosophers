@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 14:50:13 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/04 21:52:26 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/05 19:10:27 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ t_tri	lock_forks(t_seat *seat)
 	state = print_activity(seat, TAKEN_FORK);
 	if (state)
 	{
-		if (pthread_mutex_unlock(seat->right_fork))
+		if (unlock_forks(seat))
 			return (ERROR);
 		return (state);
 	}
