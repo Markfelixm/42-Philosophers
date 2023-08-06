@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:03 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 19:21:25 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/06 15:20:43 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_seat
 
 	pthread_mutex_t	meal_ts_mutex;
 	t_ll			meal_ts;
+	pthread_mutex_t	meals_eaten_mutex;
 	int				meals_eaten;
 
 	t_table			*table;
@@ -88,9 +89,11 @@ t_tri	eats(t_seat *seat);
 t_tri	is_done_eating(t_seat *seat);
 t_tri	is_lonely_philo(t_seat *seat);
 
-// memory.c
+// init.c
 t_tri	init_table(t_table *table, int ac, char **av);
 t_tri	init_seats(t_table *table);
+
+// destroy.c
 t_tri	join_threads(t_table *table, int until);
 t_tri	destroy_seats(t_seat *seats, int until);
 t_tri	destroy_table(t_table *table);

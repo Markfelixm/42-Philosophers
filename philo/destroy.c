@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 22:33:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 19:24:09 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/06 15:22:00 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ t_tri	destroy_seats(t_seat *seats, int until)
 	while (++pos <= until)
 	{
 		if (pthread_mutex_destroy(&(seats[pos].fork))
-			|| pthread_mutex_destroy(&(seats[pos].meal_ts_mutex)))
+			|| pthread_mutex_destroy(&(seats[pos].meal_ts_mutex))
+			|| pthread_mutex_destroy(&(seats[pos].meals_eaten_mutex)))
 			return (ERROR);
 	}
 	return (FALSE);

@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 16:03:18 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/05 19:37:38 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/06 15:25:21 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,11 @@ t_tri	eats(t_seat *seat)
 	state = lock_forks(seat);
 	if (state)
 		return (state);
+	if (pthread_mutex_lock(&(seat->meals_eaten_mutex)))
+		return (ERROR);
 	seat->meals_eaten++;
-	if (pthread_mutex_lock(&(seat->meal_ts_mutex)))
+	if (pthread_mutex_unlock(&(seat->meals_eaten_mutex))
+		|| pthread_mutex_lock(&(seat->meal_ts_mutex)))
 		return (ERROR);
 	seat->meal_ts = get_current_ms();
 	if (pthread_mutex_unlock(&(seat->meal_ts_mutex)))
@@ -90,11 +93,15 @@ t_tri	is_done_eating(t_seat *seat)
 {
 	t_tri	is_done;
 
+	if (pthread_mutex_lock(&(seat->meals_eaten_mutex)))
+		return (ERROR);
 	if (seat->table->num_of_meals != -1
 		&& seat->meals_eaten >= seat->table->num_of_meals)
 		is_done = TRUE;
 	else
 		is_done = FALSE;
+	if (pthread_mutex_unlock(&(seat->meals_eaten_mutex)))
+		return (ERROR);
 	return (is_done);
 }
 
