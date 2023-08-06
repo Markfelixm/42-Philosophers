@@ -6,7 +6,7 @@
 /*   By: marmulle <marmulle@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/09 17:20:05 by marmulle          #+#    #+#             */
-/*   Updated: 2023/08/06 15:20:18 by marmulle         ###   ########.fr       */
+/*   Updated: 2023/08/06 15:43:22 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,11 @@ t_tri	monitor_philosophers(t_table *table)
 		pos = -1;
 		while (++pos < table->num_of_seats)
 		{
-			if (is_done_eating(&(table->seats[pos])))
+			state = is_done_eating(&(table->seats[pos]));
+			if (state == TRUE)
 				philos_done_eating++;
+			else if (state == ERROR)
+				return (ERROR);
 			if (philos_done_eating >= table->num_of_seats)
 				return (TRUE);
 			state = has_died(&(table->seats[pos]));
